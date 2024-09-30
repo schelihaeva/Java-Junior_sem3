@@ -1,52 +1,34 @@
+package ru.geekbrains;
 
+/*
+    Задание 1: Создайте класс Person с полями name и age. Реализуйте сериализацию и десериализацию этого класса в файл.
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+Задание 2: Используя JPA, создайте базу данных для хранения объектов класса Person. Реализуйте методы для добавления, обновления и удаления объектов Person.
+ */
 
-public class Program {
+import java.io.*;
 
-    /**
-     * Задача 1: Основы Reflection API
-     * ===============================
-     * <p>
-     * Получите информацию о классе "Person" с использованием Reflection API:
-     * выведите на экран все поля и методы класса.
-     * Создайте экземпляр класса "Person" с использованием Reflection API,
-     * установите значения полей и вызовите методы.
-     * Реализуйте обработку исключений для обеспечения корректного взаимодействия
-     * с Reflection API.
-     */
+public class Main {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
+        Person person = new Person("Marta", 32, 4.1);
 
-    public static void main(String[] args) throws ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException {
-        Class<?> personalClass = Class.forName("ru.geek brains.lesson2.task1.Person");
-
-        // Получить список всех полей
-        Field[] fields = personalClass.getDeclaredFields();
-        for (Field field : fields){
-            System.out.println("Поле: " + field.getName());
+        try(FileOutputStream fileOutputStream = new FileOutputStream("persondata.bin");
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)){
+            objectOutputStream.writeObject(person);
+            System.out.println("Объект Person сериализован.");
         }
 
-        // Получить список всех конструкторов
-        Constructor[] constructors
-                = personalClass.getConstructors();
+        try(FileInputStream fileInputStream = new FileInputStream("persondata.bin");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+            person = (Person)objectInputStream.readObject();
+            System.out.println("Объект Person десериализован.");
+        }
 
-        // Создадим экземпляр класса
-        Object personInstance = constructors[0].newInstance(null);
+        System.out.println("Имя: " + person.getName());
+        System.out.println("Возраст: " + person.getAge());
+        System.out.println("Средний бал: " + person.getGPA());
 
-        Field nameField = personalClass.getDeclaredField("name");
-        nameField.setAccessible(true);
-        nameField.set(personInstance, "Alice");
-
-        Field ageField = personalClass.getDeclaredField("age");
-        ageField.setAccessible(true);
-        ageField.set(personInstance, 30);
-
-        Method displayInfoMethod = personalClass.getDeclaredMethod("displayInfo");
-        displayInfoMethod.invoke(personInstance);
 
 
     }
-
 }
